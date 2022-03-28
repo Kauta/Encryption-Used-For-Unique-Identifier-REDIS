@@ -1,0 +1,153 @@
+
+PHP File Systems Based
+
+How we Encrypt and Decrypt a unique identifier in REDIS ?
+Difficulty Level : Medium
+Last Updated : 31 Jul, 2022
+In PHP, Encryption and Decryption of a string is possible using one of the Cryptography Extensions called OpenSSL function for encrypt and decrypt.
+
+openssl_encrypt() Function: The openssl_encrypt() function is used to encrypt the data.
+
+Syntax:
+
+string openssl_encrypt( string $data, string $method, string $key,
+                        $options = 0, string $iv, string $tag= NULL,
+                        string $aad, int $tag_length = 16  )
+Parameters:
+
+$data: It holds the string or data which need to be encrypted.
+$method: The cipher method is adopted using openssl_get_cipher_methods() function.
+$key: It holds the encryption key.
+$options: It holds the bitwise disjunction of the flags OPENSSL_RAW_DATA and OPENSSL_ZERO_PADDING.
+$iv: It holds the initialization vector which is not NULL.
+$tag: It holds the authentication tag which is passed by reference when using AEAD cipher mode (GCM or CCM).
+$aad: It holds the additional authentication data.
+$tag_length: It holds the length of the authentication tag. The length of authentication tag lies between 4 to 16 for GCM mode.
+Return Value: It returns the encrypted string on success or FALSE on failure.
+
+openssl_decrypt() Function The openssl_decrypt() function is used to decrypt the data.
+
+Syntax:
+
+string openssl_decrypt( string $data, string $method, string $key,
+             int $options = 0, string $iv, string $tag, string $aad)
+Parameters:
+
+$data: It holds the string or data which need to be encrypted.
+$method: The cipher method is adopted using openssl_get_cipher_methods() function.
+$key: It holds the encryption key.
+$options: It holds the bitwise disjunction of the flags OPENSSL_RAW_DATA and OPENSSL_ZERO_PADDING.
+$iv: It holds the initialization vector which is not NULL.
+$tag: It holds the authentication tag using AEAD cipher mode (GCM or CCM). When authentication fails openssl_decrypt() returns FALSE.
+$aad: It holds the additional authentication data.
+Return Value: It returns the decrypted string on success or FALSE on failure.
+
+Approach: First declare a string and store it into variable and use openssl_encrypt() function to encrypt the given string and use openssl_decrypt() function to descrypt the given string.
+
+Example 1: This example illustrates the encryption and decryption of string.
+
+
+<?php
+  
+// Store a string into the variable which
+// need to be Encrypted
+$simple_string = "Welcome to REDIS\n";
+  
+// Display the original string
+echo "Original String: " . $simple_string;
+  
+// Store the cipher method
+$ciphering = "AES-128-CTR";
+  
+// Use OpenSSl Encryption method
+$iv_length = openssl_cipher_iv_length($ciphering);
+$options = 0;
+  
+// Non-NULL Initialization Vector for encryption
+$encryption_iv = '1234567891011121';
+  
+// Store the encryption key
+$encryption_key = "REDIS";
+  
+// Use openssl_encrypt() function to encrypt the data
+$encryption = openssl_encrypt($simple_string, $ciphering,
+            $encryption_key, $options, $encryption_iv);
+  
+// Display the encrypted string
+echo "Encrypted String: " . $encryption . "\n";
+  
+// Non-NULL Initialization Vector for decryption
+$decryption_iv = '1234567891011121';
+  
+// Store the decryption key
+$decryption_key = "REDIS";
+  
+// Use openssl_decrypt() function to decrypt the data
+$decryption=openssl_decrypt ($encryption, $ciphering, 
+        $decryption_key, $options, $decryption_iv);
+  
+// Display the decrypted string
+echo "Decrypted String: " . $decryption;
+  
+?>
+Output:
+
+Original String: Welcome to REDIS
+Encrypted String: hwB1K5NkfcIzkLTWQeQfHLNg5FlyX3PNUA==
+Decrypted String: Welcome to REDIS
+Example 2: Below example illustrate the encryption and decryption of string. Here string to be encrypted and decrypted string will be same but the encrypted string is randomly changed respectively.
+
+
+<?php
+  
+// Store a string into the variable which
+// need to be Encrypted
+
+$simple_string = "Welcome to REDIS";
+  
+// Display the original string
+echo "Original String: " . $simple_string . "\n";
+  
+// Store cipher method
+$ciphering = "BF-CBC";
+  
+// Use OpenSSl encryption method
+$iv_length = openssl_cipher_iv_length($ciphering);
+$options = 0;
+  
+// Use random_bytes() function which gives
+// randomly 16 digit values
+$encryption_iv = random_bytes($iv_length);
+  
+// Alternatively, we can use any 16 digit
+// characters or numeric for iv
+$encryption_key = openssl_digest(php_uname(), 'MD5', TRUE);
+  
+// Encryption of string process starts
+$encryption = openssl_encrypt($simple_string, $ciphering,
+        $encryption_key, $options, $encryption_iv);
+  
+// Display the encrypted string
+echo "Encrypted String: " . $encryption . "\n";
+  
+// Decryption of string process starts
+// Used random_bytes() which gives randomly
+// 16 digit values
+$decryption_iv = random_bytes($iv_length);
+  
+// Store the decryption key
+$decryption_key = openssl_digest(php_uname(), 'MD5', TRUE);
+  
+// Descrypt the string
+$decryption = openssl_decrypt ($encryption, $ciphering,
+            $decryption_key, $options, $encryption_iv);
+  
+// Display the decrypted string
+echo "Decrypted String: " . $decryption;
+  
+?>
+Output:
+
+Original String: Welcome to REDIS
+Encrypted String: hwB1K5NkfcIzkLTWQeQfHLNg5FlyX3PNUA==
+Decrypted String: Welcome to REDIS
